@@ -1,0 +1,49 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /var/www/myapp/build
+
+hooks:
+  BeforeInstall:
+    - location: |
+        echo "Removing old files..."
+        rm -rf /var/www/myapp/build/*
+        echo "Old files removed"
+
+  AfterInstall:
+    - location: |
+        echo "Installing Node.js..."
+        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+        echo "Node.js installed"
+
+    - location: |
+        echo "Installing npm packages..."
+        cd /var/www/myapp
+        npm install
+        echo "npm packages installed"
+
+    - location: |
+        echo "Adding serve package..."
+        npm install -g serve
+        echo "serve package added"
+
+  ApplicationStart:
+    - location: |
+        echo "Starting the application..."
+        cd /var/www/myapp
+        nohup serve -s build > app.log 2>&1 &
+        echo "Application started"
+
+  ApplicationStop:
+    - location: |
+        echo "Stopping the application..."
+        pkill -f 'serve'
+        echo "Application stopped"
+
+  ValidateService:
+    - location: |
+        echo "Validating service..."
+        curl -s http://localhost:3000/health || exit 1
+        echo "Service validation passed"
