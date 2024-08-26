@@ -8,33 +8,35 @@ hooks:
   BeforeInstall:
     - location: |
         echo "Removing old files..."
-        mkdir -p /var/www/myapp/
+        mkdir -p /var/www/myapp
         rm -rf /var/www/myapp/*
         echo "Old files removed"
 
   AfterInstall:
     - location: |
         echo "Installing Node.js..."
-        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-        sudo apt-get install -y nodejs
+        curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
+        yum install -y nodejs
         echo "Node.js installed"
 
     - location: |
         echo "Installing npm packages..."
-        cd /var/www/myapp
-        npm install
+        cd /var/www
+        npm init --yes
+        npm install -g serve
         echo "npm packages installed"
 
     - location: |
-        echo "Adding serve package..."
-        npm install -g serve
-        echo "serve package added"
+        echo "unzip file"
+        cd /var/www/myapp
+        yum install unzip
+        unzip build
 
   ApplicationStart:
     - location: |
         echo "Starting the application..."
-        cd /var/www/myapp
-        npx serve -s build
+        cd /var/www
+        npx serve -s myapp -l 3000
         echo "Application started"
 
   ApplicationStop:
@@ -46,5 +48,5 @@ hooks:
   ValidateService:
     - location: |
         echo "Validating service..."
-        curl -s http://localhost:3000/health || exit 1
+        curl -s http://localhost:3000 || exit 1
         echo "Service validation passed"
