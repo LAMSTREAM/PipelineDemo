@@ -6,47 +6,53 @@ files:
 
 hooks:
   BeforeInstall:
-    - location: |
-        echo "Removing old files..."
-        mkdir -p /var/www/myapp
-        rm -rf /var/www/myapp/*
-        echo "Old files removed"
+    - runas: root
+      timeout: 300
+      commands:
+        - echo "Removing old files..."
+        - mkdir -p /var/www/myapp
+        - rm -rf /var/www/myapp/*
+        - echo "Old files removed"
 
   AfterInstall:
-    - location: |
-        echo "Installing Node.js..."
-        curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
-        yum install -y nodejs
-        echo "Node.js installed"
-
-    - location: |
-        echo "Installing npm packages..."
-        cd /var/www
-        npm init --yes
-        npm install -g serve
-        echo "npm packages installed"
-
-    - location: |
-        echo "unzip file"
-        cd /var/www/myapp
-        yum install unzip
-        unzip build
+    - runas: root
+      timeout: 300
+      commands:
+        - echo "Installing Node.js..."
+        - curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
+        - yum install -y nodejs
+        - echo "Node.js installed"
+        - echo "Installing npm packages..."
+        - cd /var/www
+        - npm init --yes
+        - npm install -g serve
+        - echo "npm packages installed"
+        - echo "Unzipping file..."
+        - cd /var/www/myapp
+        - yum install -y unzip
+        - unzip build
 
   ApplicationStart:
-    - location: |
-        echo "Starting the application..."
-        cd /var/www
-        npx serve -s myapp -l 3000
-        echo "Application started"
+    - runas: root
+      timeout: 300
+      commands:
+        - echo "Starting the application..."
+        - cd /var/www
+        - npx serve -s myapp -l 3000
+        - echo "Application started"
 
   ApplicationStop:
-    - location: |
-        echo "Stopping the application..."
-        pkill -f 'serve'
-        echo "Application stopped"
+    - runas: root
+      timeout: 300
+      commands:
+        - echo "Stopping the application..."
+        - pkill -f 'serve'
+        - echo "Application stopped"
 
   ValidateService:
-    - location: |
-        echo "Validating service..."
-        curl -s http://localhost:3000 || exit 1
-        echo "Service validation passed"
+    - runas: root
+      timeout: 300
+      commands:
+        - echo "Validating service..."
+        - curl -s http://localhost:3000 || exit 1
+        - echo "Service validation passed"
