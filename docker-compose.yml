@@ -1,16 +1,16 @@
-
-version: '3'
+version: '3.8'
 
 services:
-  graphql:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins_container
     ports:
-      - "3000:3000"
-    stdin_open: true
-    tty: true
+      - "8080:8080"    # Expose Jenkins web UI port
+      - "50000:50000"  # Port for Jenkins slave agents
     volumes:
-      - .:/app
-    environment:
-      - CHOKIDAR_USEPOLLING=true
+      - jenkins_data:/var/jenkins_home  # Persistent data volume
+    restart: always    # Automatically restart the container on failure or reboot
+
+volumes:
+  jenkins_data:
+    driver: local       # Explicitly specify the volume driver (default is `local`)
