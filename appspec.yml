@@ -2,13 +2,13 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /var/www/myapp/build
+    destination: /var/www/myapp
 
 hooks:
   BeforeInstall:
     - location: |
         echo "Removing old files..."
-        rm -rf /var/www/myapp/build/*
+        rm -rf /var/www/myapp/*
         echo "Old files removed"
 
   AfterInstall:
@@ -33,7 +33,7 @@ hooks:
     - location: |
         echo "Starting the application..."
         cd /var/www/myapp
-        nohup serve -s build > app.log 2>&1 &
+        npx serve -s build
         echo "Application started"
 
   ApplicationStop:
